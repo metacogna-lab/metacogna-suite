@@ -1,4 +1,4 @@
 # Task Bridge
 
-- Current: Phase 2 — branch `phase-2-secret-hardening` (secret hygiene changes staged)
-- Next: Final review + merge back to `main`
+- Current: Phase 3 — branch `phase-3-routing-hardening` (routing fixes staged)
+- Next: Review + merge back to `main`
