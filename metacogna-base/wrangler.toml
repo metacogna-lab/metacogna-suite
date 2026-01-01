@@ -6,3 +6,19 @@ workers_dev = false
 routes = [
   { pattern = "hq.metacogna.ai/*", zone_name = "metacogna.ai" }
 ]
+
+[vars]
+ENVIRONMENT = "production"
+
+[[kv_namespaces]]
+binding = "BASE_KV"
+id = "kv_base_placeholder"
+
+[[r2_buckets]]
+binding = "BASE_STORAGE"
+bucket_name = "metacogna-base"
+
+[[d1_databases]]
+binding = "BASE_DB"
+database_name = "metacogna-base"
+database_id = "00000000-0000-0000-0000-000000000000"

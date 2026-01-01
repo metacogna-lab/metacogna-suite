@@ -15,16 +15,34 @@ const jsonResponse = (body: unknown, status = 200) =>
     headers: JSON_HEADERS,
   });
 
+interface Env {
+  BASE_DB: D1Database;
+  BASE_KV: KVNamespace;
+  BASE_STORAGE: R2Bucket;
+  ENVIRONMENT?: string;
+}
+
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === '/health') {
-      return jsonResponse({ status: 'ok', service: 'metacogna-base', timestamp: Date.now() });
+      const healthy = Boolean(env.BASE_DB && env.BASE_KV && env.BASE_STORAGE);
+      return jsonResponse({
+        status: healthy ? 'ok' : 'degraded',
+        service: 'metacogna-base',
+        environment: env.ENVIRONMENT || 'development',
+        timestamp: Date.now(),
+        bindings: {
+          db: env.BASE_DB ? 'bound' : 'missing',
+          kv: env.BASE_KV ? 'bound' : 'missing',
+          storage: env.BASE_STORAGE ? 'bound' : 'missing',
+        },
+      });
     }
 
     return jsonResponse({
       project: 'metacogna-base',
-      status: 'placeholder',
+      environment: env.ENVIRONMENT || 'development',
       routes: ROUTES,
       message: 'Replace this worker with the real gateway homepage.',
     });
