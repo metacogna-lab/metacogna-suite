@@ -1,4 +1,4 @@
 # Task Bridge
 
-- Current: Phase 4 — branch `phase-4-integration-assessment` (integration fixes staged)
-- Next: Review, summarize findings, and merge to `main`
+- Current: Phase 4 merged into `main` (gateway auth + rename complete)
+- Next: Await Phase 5 scope definition
