@@ -22,5 +22,5 @@ binding = "CORE_SERVICE"
 service = "metacogna"
 
 [[services]]
-binding = "PORTAL_SERVICE"
+binding = "KV_SERVICE"
 service = "metacogna-ai-worker"

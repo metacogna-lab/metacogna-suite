@@ -16,12 +16,19 @@ interface R2Bucket {
   put(key: string, value: string, options?: { httpMetadata?: Record<string, string> }): Promise<void>;
 }
 
+interface ServiceBinding {
+  fetch(request: Request | string, init?: RequestInit): Promise<Response>;
+}
+
 interface Env {
   ACCOUNTS: R2Bucket;
   GATEWAY_JWT_SECRET: string;
-  BUILD_SERVICE_URL: string;
-  KV_SERVICE_URL: string;
-  CORE_SERVICE_URL: string;
+  BUILD_SERVICE_URL?: string;
+  KV_SERVICE_URL?: string;
+  CORE_SERVICE_URL?: string;
+  BUILD_SERVICE?: ServiceBinding;
+  KV_SERVICE?: ServiceBinding;
+  CORE_SERVICE?: ServiceBinding;
 }
 
 const JSON_HEADERS = {
@@ -30,9 +37,9 @@ const JSON_HEADERS = {
 };
 
 const ROUTES = [
-  { prefix: '/build', envKey: 'BUILD_SERVICE_URL' as const, route: ProjectRoute.BUILD },
-  { prefix: '/kv', envKey: 'KV_SERVICE_URL' as const, route: ProjectRoute.KV },
-  { prefix: '/core', envKey: 'CORE_SERVICE_URL' as const, route: ProjectRoute.CORE },
+  { prefix: '/build', envKey: 'BUILD_SERVICE_URL' as const, serviceKey: 'BUILD_SERVICE' as const, route: ProjectRoute.BUILD },
+  { prefix: '/kv', envKey: 'KV_SERVICE_URL' as const, serviceKey: 'KV_SERVICE' as const, route: ProjectRoute.KV },
+  { prefix: '/core', envKey: 'CORE_SERVICE_URL' as const, serviceKey: 'CORE_SERVICE' as const, route: ProjectRoute.CORE },
 ];
 
 type RouteMatch = typeof ROUTES[number];
@@ -159,21 +166,32 @@ async function verifyToken(request: Request, env: Env, route: ProjectRoute) {
   return claims;
 }
 
+const stripRoutePrefix = (url: URL, match: RouteMatch) => url.pathname.substring(match.prefix.length) || '/';
+
 function rewriteUrl(url: URL, match: RouteMatch, target: string) {
-  const strippedPath = url.pathname.substring(match.prefix.length) || '/';
+  const strippedPath = stripRoutePrefix(url, match);
   const targetUrl = new URL(target);
   targetUrl.pathname = `${targetUrl.pathname.replace(/\/$/, '')}${strippedPath}`;
   targetUrl.search = url.search;
   return targetUrl;
 }
 
-async function handleProxy(request: Request, env: Env, match: RouteMatch) {
-  const targetBase = (env as any)[match.envKey] as string;
-  if (!targetBase) {
-    return errorResponse(match.route, 502, 'MISSING_TARGET', `Missing target for ${match.prefix}`);
-  }
+const createProxyInit = (request: Request, route: ProjectRoute): RequestInit => {
+  const headers = new Headers(request.headers);
+  headers.delete('Authorization');
+  headers.set('X-Gateway-Route', route);
 
+  return {
+    method: request.method,
+    headers,
+    body: request.body,
+    redirect: 'manual',
+  };
+};
+
+async function handleProxy(request: Request, env: Env, match: RouteMatch) {
   const shouldVerify = match.route === ProjectRoute.BUILD || request.headers.has('Authorization');
+
   if (shouldVerify) {
     try {
       await verifyToken(request, env, match.route);
@@ -185,18 +203,26 @@ async function handleProxy(request: Request, env: Env, match: RouteMatch) {
   }
 
   const url = new URL(request.url);
+  const proxyInit = createProxyInit(request, match.route);
+  const serviceBinding = match.serviceKey ? ((env as any)[match.serviceKey] as ServiceBinding | undefined) : undefined;
+
+  if (serviceBinding?.fetch) {
+    const internalUrl = new URL('https://service.binding');
+    const strippedPath = stripRoutePrefix(url, match);
+    internalUrl.pathname = strippedPath;
+    internalUrl.search = url.search;
+
+    const proxyReq = new Request(internalUrl.toString(), proxyInit);
+    return serviceBinding.fetch(proxyReq);
+  }
+
+  const targetBase = match.envKey ? ((env as any)[match.envKey] as string | undefined) : undefined;
+  if (!targetBase) {
+    return errorResponse(match.route, 502, 'MISSING_TARGET', `Missing target for ${match.prefix}`);
+  }
   const targetUrl = rewriteUrl(url, match, targetBase);
 
-  const headers = new Headers(request.headers);
-  headers.delete('Authorization');
-  headers.set('X-Gateway-Route', match.route);
-
-  const proxyReq = new Request(targetUrl.toString(), {
-    method: request.method,
-    headers,
-    body: request.body,
-    redirect: 'manual',
-  });
+  const proxyReq = new Request(targetUrl.toString(), proxyInit);
 
   return fetch(proxyReq);
 }

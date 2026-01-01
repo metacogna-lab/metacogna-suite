@@ -20,5 +20,5 @@
 
 ### Notes
 
-- Service bindings remove the need to expose each downstream worker publicly and keep credentials off the wire.
+- Service bindings remove the need to expose each downstream worker publicly and keep credentials off the wire while falling back to HTTPS targets when bindings are missing.
 - Public DNS records should still point to the relevant worker routes for staging/debug but production traffic should enter through the gateway.
