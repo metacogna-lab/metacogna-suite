@@ -25,3 +25,7 @@ service = "metacogna"
 [[services]]
 binding = "KV_SERVICE"
 service = "metacogna-ai-worker"
+
+[[services]]
+binding = "BUILD_SERVICE"
+service = "parit-supervisor"
