@@ -11,8 +11,11 @@ routes = [
 BUILD_SERVICE_URL = "https://build.metacogna.ai"
 KV_SERVICE_URL = "https://kv.metacogna.ai"
 CORE_SERVICE_URL = "https://parti.metacogna.ai"
+GITHUB_CLIENT_ID = "github_client_id"
 
-# Secrets (set via `wrangler secret put GATEWAY_JWT_SECRET`)
+# Secrets (set via `wrangler secret put ...`)
+# - GATEWAY_JWT_SECRET (JWT signing)
+# - GITHUB_CLIENT_SECRET (GitHub OAuth exchange)
 
 [[r2_buckets]]
 binding = "ACCOUNTS"
@@ -28,4 +31,4 @@ service = "metacogna-ai-worker"
 
 [[services]]
 binding = "BUILD_SERVICE"
-service = "parit-supervisor"
+service = "parti-supervisor"
