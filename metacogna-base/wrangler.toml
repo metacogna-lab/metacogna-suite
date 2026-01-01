@@ -1,6 +1,8 @@
 name = "metacogna-base"
 main = "src/index.ts"
 compatibility_date = "2024-07-01"
-workers_dev = true
+workers_dev = false
 
-# No routes yet – this worker is currently only consumed via the main gateway.
+routes = [
+  { pattern = "hq.metacogna.ai/*", zone_name = "metacogna.ai" }
+]

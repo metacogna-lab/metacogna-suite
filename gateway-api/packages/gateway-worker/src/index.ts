@@ -42,7 +42,7 @@ const ROUTES = [
   { prefix: '/build', envKey: 'BUILD_SERVICE_URL' as const, serviceKey: 'BUILD_SERVICE' as const, route: ProjectRoute.BUILD },
   { prefix: '/kv', envKey: 'KV_SERVICE_URL' as const, serviceKey: 'KV_SERVICE' as const, route: ProjectRoute.KV },
   { prefix: '/core', envKey: 'CORE_SERVICE_URL' as const, serviceKey: 'CORE_SERVICE' as const, route: ProjectRoute.CORE },
-  { prefix: '/base', envKey: 'BASE_SERVICE_URL' as const, serviceKey: 'BASE_SERVICE' as const, route: ProjectRoute.BASE },
+  { prefix: '/hq', envKey: 'BASE_SERVICE_URL' as const, serviceKey: 'BASE_SERVICE' as const, route: ProjectRoute.BASE },
 ];
 
 type RouteMatch = typeof ROUTES[number];
