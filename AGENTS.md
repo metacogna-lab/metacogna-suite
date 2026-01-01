@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Four Bun/TypeScript packages live at the root: `gateway-api/` (Cloudflare worker in `packages/gateway-worker` with shared auth in `packages/shared`), `metacogna-rag/` (RAG console plus Prisma `db/` and worker code), `metacogna.ai-landing/` (Vite marketing site), and `parti-architecture/` (architecture explorer with `workers/*`). Keep docs beside each module (`docs/`, `deployment/`, `analysis/`), colocate state with `store/` and domain logic under `services/`, and file integration or e2e specs inside `__tests__/`, `e2e/`, or `worker/tests`.
+Five Bun/TypeScript packages live at the root: `gateway-api/` (Cloudflare worker in `packages/gateway-worker` with shared auth in `packages/shared`), `metacogna-rag/` (RAG console plus Prisma `db/` and worker code), `metacogna.ai-landing/` (Vite marketing site), `parti-architecture/` (architecture explorer with `workers/*`), and `metacogna-base/` (placeholder worker that the gateway binds to for future cross-project navigation). Keep docs beside each module (`docs/`, `deployment/`, `analysis/`), colocate state with `store/` and domain logic under `services/`, and file integration or e2e specs inside `__tests__/`, `e2e/`, or `worker/tests`.
 
 ## Build, Test, and Development Commands
 - `cd gateway-api && bun install && bun run dev` — installs workspace deps and spins up the local worker stack (use `bun run build` when bundling shared packages).

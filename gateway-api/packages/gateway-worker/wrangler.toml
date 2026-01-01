@@ -11,6 +11,7 @@ routes = [
 BUILD_SERVICE_URL = "https://build.metacogna.ai"
 KV_SERVICE_URL = "https://kv.metacogna.ai"
 CORE_SERVICE_URL = "https://parti.metacogna.ai"
+BASE_SERVICE_URL = "https://base.metacogna.ai"
 GITHUB_CLIENT_ID = "github_client_id"
 
 # Secrets (set via `wrangler secret put ...`)
@@ -32,3 +33,7 @@ service = "metacogna-ai-worker"
 [[services]]
 binding = "BUILD_SERVICE"
 service = "parti-supervisor"
+
+[[services]]
+binding = "BASE_SERVICE"
+service = "metacogna-base"

@@ -1,0 +1,6 @@
+name = "metacogna-base"
+main = "src/index.ts"
+compatibility_date = "2024-07-01"
+workers_dev = true
+
+# No routes yet – this worker is currently only consumed via the main gateway.

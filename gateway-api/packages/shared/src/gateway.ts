@@ -6,6 +6,7 @@ export enum ProjectRoute {
   KV = 'KV',
   BUILD = 'BUILD',
   CORE = 'CORE',
+  BASE = 'BASE',
 }
 
 /**
