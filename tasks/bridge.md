@@ -1,4 +1,4 @@
 # Task Bridge
 
-- Current: Phase 1 — routing baseline on branch `phase-1-routing-baseline` (docs + wrangler + proxy refactor)
-- Next: Summarize results, stage changes, and prep Phase 2 (secret hygiene)
+- Current: Phase 2 — branch `phase-2-secret-hardening` (secret hygiene changes staged)
+- Next: Final review + merge back to `main`
