@@ -1,0 +1,24 @@
+.env
+*.env
+*.env.*
+# TypeScript
+*.tsbuildinfo
+*.d.ts
+# Output directories
+dist/
+build/
+out/
+# Testing, coverage
+coverage/
+.nyc_output/
+# IDE/editor
+.vscode/
+.idea/
+*.sw?
+# Bun package manager cache
+.bun/
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lockb

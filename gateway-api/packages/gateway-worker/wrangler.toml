@@ -1,0 +1,26 @@
+name = "metacogna-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-07-01"
+workers_dev = false
+
+routes = [
+  { pattern = "api.metacogna.ai/*", zone_name = "metacogna.ai" }
+]
+
+[vars]
+GATEWAY_JWT_SECRET = "changeme"
+BUILD_SERVICE_URL = "https://build.metacogna.ai"
+KV_SERVICE_URL = "https://kv.metacogna.ai"
+CORE_SERVICE_URL = "https://parti.metacogna.ai"
+
+[[r2_buckets]]
+binding = "ACCOUNTS"
+bucket_name = "metacogna-accounts"
+
+[[services]]
+binding = "CORE_SERVICE"
+service = "metacogna"
+
+[[services]]
+binding = "PORTAL_SERVICE"
+service = "metacogna-ai-worker"

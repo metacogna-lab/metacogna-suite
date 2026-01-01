@@ -1,0 +1,13 @@
+{
+  "name": "@gateway/shared",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "jose": "^5.9.3",
+    "zod": "^3.22.4"
+  }
+}
