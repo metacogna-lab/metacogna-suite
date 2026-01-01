@@ -1,13 +1,13 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Four Bun/TypeScript packages live at the root: `gateway-api/` (Cloudflare worker in `packages/gateway-worker` with shared auth in `packages/shared`), `metacogna-rag/` (RAG console plus Prisma `db/` and worker code), `metacogna.ai-landing/` (Vite marketing site), and `parit-architecture/` (architecture explorer with `workers/*`). Keep docs beside each module (`docs/`, `deployment/`, `analysis/`), colocate state with `store/` and domain logic under `services/`, and file integration or e2e specs inside `__tests__/`, `e2e/`, or `worker/tests`.
+Four Bun/TypeScript packages live at the root: `gateway-api/` (Cloudflare worker in `packages/gateway-worker` with shared auth in `packages/shared`), `metacogna-rag/` (RAG console plus Prisma `db/` and worker code), `metacogna.ai-landing/` (Vite marketing site), and `parti-architecture/` (architecture explorer with `workers/*`). Keep docs beside each module (`docs/`, `deployment/`, `analysis/`), colocate state with `store/` and domain logic under `services/`, and file integration or e2e specs inside `__tests__/`, `e2e/`, or `worker/tests`.
 
 ## Build, Test, and Development Commands
 - `cd gateway-api && bun install && bun run dev` — installs workspace deps and spins up the local worker stack (use `bun run build` when bundling shared packages).
 - `cd metacogna-rag && bun run dev` to launch the Vite dashboard; `bun run test`, `bun run test:worker`, and `bun run test:e2e` cover Jest, worker harness, and Playwright flows.
 - `cd metacogna.ai-landing && bun run dev` previews the site; `bun run lint` (TypeScript) is the required gate before pushing.
-- `cd parit-architecture && bun run dev` during iteration, `bun run build` to emit `dist/`, and `bun run deploy:all` to push every worker.
+- `cd parti-architecture && bun run dev` during iteration, `bun run build` to emit `dist/`, and `bun run deploy:all` to push every worker.
 
 ## Coding Style & Naming Conventions
 Use TypeScript with 2-space indentation, semicolons, and ES modules. React components and Zustand stores adopt PascalCase filenames, hooks/utilities remain camelCase, shared schema/constants use uppercase, imports flow external→internal, and lint/tsc scripts must pass before committing; model new APIs with `zod` when feasible.
