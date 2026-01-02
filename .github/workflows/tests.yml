@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Gateway API tests
+        run: |
+          cd gateway-api
+          bun install
+          bun run --filter "@gateway/worker" test
+
+      - name: Set up Node for base worker
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Base worker tests
+        run: |
+          cd metacogna-base
+          npm install
+          npm test
+
+      - name: RAG worker tests
+        run: |
+          cd metacogna-rag
+          bun install
+          bun run test:worker:jest
+
+      - name: Parti supervisor tests
+        run: |
+          cd parti-architecture
+          bun install
+          bun run test
+
+      - name: Landing Playwright tests
+        env:
+          E2E_GATEWAY_URL: https://api.metacogna.ai
+          E2E_LANDING_URL: https://metacogna.ai
+        run: |
+          cd metacogna.ai-landing
+          bun install
+          npx playwright install --with-deps
+          bun run test:e2e

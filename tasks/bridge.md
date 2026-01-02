@@ -1,4 +1,4 @@
 # Task Bridge
 
-- Current: Phase 4 merged into `main` (gateway auth + rename complete)
-- Next: Await Phase 5 scope definition
+- Current: Phase 5 — branch `phase-5-integration-impl` (Jest/Playwright scaffolding complete)
+- Next: Monitor CI + proceed to next feature when ready
