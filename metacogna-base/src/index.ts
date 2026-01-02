@@ -3,6 +3,24 @@ const JSON_HEADERS = {
   'Access-Control-Allow-Origin': '*',
 };
 
+interface D1Database {
+  prepare(query: string): {
+    bind(...values: any[]): any;
+    first<T = unknown>(): Promise<T | null>;
+    run<T = unknown>(): Promise<T>;
+  };
+}
+
+interface KVNamespace {
+  get(key: string, type?: 'text' | 'json' | 'arrayBuffer'): Promise<any>;
+  put(key: string, value: string | ArrayBuffer, options?: any): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
+interface R2Bucket {
+  head?(key: string): Promise<any>;
+}
+
 const ROUTES = [
   { name: 'RAG Console', url: 'https://parti.metacogna.ai' },
   { name: 'Portal / KV', url: 'https://kv.metacogna.ai' },
