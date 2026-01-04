@@ -7,6 +7,7 @@ export enum ProjectRoute {
   BUILD = 'BUILD',
   CORE = 'CORE',
   BASE = 'BASE',
+  WEBHOOK = 'WEBHOOK',
 }
 
 /**

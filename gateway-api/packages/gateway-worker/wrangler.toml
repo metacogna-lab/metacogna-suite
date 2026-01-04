@@ -17,6 +17,7 @@ GITHUB_CLIENT_ID = "Ov23liXlcYf8bISRUay8"
 # Secrets (set via `wrangler secret put ...`)
 # - GATEWAY_JWT_SECRET (JWT signing)
 # - GITHUB_CLIENT_SECRET (GitHub OAuth exchange)
+# - NOTION_WEBHOOK_SECRET (validates Notion webhook signatures)
 
 [[r2_buckets]]
 binding = "ACCOUNTS"

@@ -44,4 +44,18 @@ describe('gateway worker', () => {
     const proxiedRequest = (env.BASE_SERVICE.fetch as jest.Mock).mock.calls[0][0] as Request;
     expect(new URL(proxiedRequest.url).pathname).toBe('/health');
   });
+
+  it('forwards Notion webhooks to configured services', async () => {
+    const env = createEnv();
+    env.NOTION_WEBHOOK_SECRET = 'secret';
+    const request = new Request('https://api.metacogna.ai/webhooks/notion', {
+      method: 'POST',
+      headers: { 'X-Notion-Signature': 'secret' },
+      body: JSON.stringify({ event: 'test' }),
+    });
+
+    const response = await worker.fetch(request, env);
+    expect(response.status).toBe(202);
+    expect(env.BASE_SERVICE.fetch).toHaveBeenCalledTimes(1);
+  });
 });

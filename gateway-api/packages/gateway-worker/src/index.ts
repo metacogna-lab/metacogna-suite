@@ -26,11 +26,14 @@ interface Env {
   BUILD_SERVICE_URL?: string;
   KV_SERVICE_URL?: string;
   CORE_SERVICE_URL?: string;
+  BASE_SERVICE_URL?: string;
   BUILD_SERVICE?: ServiceBinding;
   KV_SERVICE?: ServiceBinding;
   CORE_SERVICE?: ServiceBinding;
+  BASE_SERVICE?: ServiceBinding;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
+  NOTION_WEBHOOK_SECRET?: string;
 }
 
 const JSON_HEADERS = {
@@ -44,6 +47,10 @@ const ROUTES = [
   { prefix: '/core', envKey: 'CORE_SERVICE_URL' as const, serviceKey: 'CORE_SERVICE' as const, route: ProjectRoute.CORE },
   { prefix: '/hq', envKey: 'BASE_SERVICE_URL' as const, serviceKey: 'BASE_SERVICE' as const, route: ProjectRoute.BASE },
 ];
+
+const WEBHOOK_TARGETS: Record<string, ReadonlyArray<keyof Env>> = {
+  notion: ['BASE_SERVICE', 'KV_SERVICE', 'CORE_SERVICE'],
+};
 
 type RouteMatch = typeof ROUTES[number];
 
@@ -417,6 +424,10 @@ export default {
       return handleOptions();
     }
 
+    if (url.pathname.startsWith('/webhooks/')) {
+      return handleWebhook(request, env);
+    }
+
     if (url.pathname === '/auth/login' && request.method === 'POST') {
       return handleLogin(request, env);
     }
@@ -454,3 +465,64 @@ export default {
     return errorResponse(ProjectRoute.CORE, 404, 'NOT_FOUND', 'Route not handled');
   },
 };
+
+async function handleWebhook(request: Request, env: Env) {
+  const url = new URL(request.url);
+  const [, , sourceRaw] = url.pathname.split('/');
+  const source = sourceRaw?.toLowerCase();
+  if (!source) {
+    return errorResponse(ProjectRoute.WEBHOOK, 400, 'INVALID_SOURCE', 'Webhook source missing');
+  }
+
+  if (source === 'notion') {
+    return handleNotionWebhook(request, env);
+  }
+
+  return errorResponse(ProjectRoute.WEBHOOK, 404, 'UNKNOWN_SOURCE', `Webhook source ${source} not supported`);
+}
+
+function resolveWebhookTargets(source: string, request: Request, env: Env) {
+  const headerTargets = request.headers.get('X-Gateway-Webhook-Targets');
+  const candidateNames = headerTargets
+    ? headerTargets.split(',').map((v) => v.trim()).filter(Boolean)
+    : (WEBHOOK_TARGETS[source] as string[] | undefined) || [];
+
+  const deduped = Array.from(new Set(candidateNames));
+  return deduped
+    .map((name) => ({ name, binding: (env as any)[name] as ServiceBinding | undefined }))
+    .filter((entry) => Boolean(entry.binding?.fetch));
+}
+
+async function handleNotionWebhook(request: Request, env: Env) {
+  if (!env.NOTION_WEBHOOK_SECRET) {
+    return errorResponse(ProjectRoute.WEBHOOK, 500, 'NOTION_SECRET_MISSING', 'Notion secret not configured');
+  }
+
+  const signature = request.headers.get('X-Notion-Signature');
+  if (!signature || signature !== env.NOTION_WEBHOOK_SECRET) {
+    return errorResponse(ProjectRoute.WEBHOOK, 401, 'INVALID_SIGNATURE', 'Notion signature invalid');
+  }
+
+  const bodyText = await request.text();
+  const headers = new Headers(request.headers);
+  headers.set('X-Gateway-Source', 'notion');
+
+  const targets = resolveWebhookTargets('notion', request, env);
+  if (targets.length === 0) {
+    return errorResponse(ProjectRoute.WEBHOOK, 502, 'NO_TARGETS', 'No services configured for this webhook');
+  }
+
+  const forwardResults = await Promise.all(
+    targets.map(async ({ name, binding }) => {
+      const forwardRequest = new Request(`https://${name.toLowerCase()}.internal/webhooks/notion`, {
+        method: request.method,
+        headers,
+        body: bodyText,
+      });
+      const response = await binding!.fetch(forwardRequest);
+      return { target: name, status: response.status };
+    }),
+  );
+
+  return jsonResponse({ success: true, forwarded: forwardResults }, 202);
+}
