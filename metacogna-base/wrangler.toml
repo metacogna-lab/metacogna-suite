@@ -1,5 +1,5 @@
 name = "metacogna-base"
-main = "src/index.ts"
+main = "src/index.js"
 compatibility_date = "2024-07-01"
 workers_dev = false
 
@@ -12,7 +12,7 @@ ENVIRONMENT = "production"
 
 [[kv_namespaces]]
 binding = "BASE_KV"
-id = "kv_base_placeholder"
+id = "3d76b288fc9d4e0194251b8d9f52cf4a"
 
 [[r2_buckets]]
 binding = "BASE_STORAGE"
@@ -20,5 +20,5 @@ bucket_name = "metacogna-base"
 
 [[d1_databases]]
 binding = "BASE_DB"
-database_name = "metacogna-base"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_name = "metacogna-base-db"
+database_id = "be2ced3a-2ed9-49d8-be19-c9b3afd26350"
