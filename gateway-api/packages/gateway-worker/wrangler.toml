@@ -1,5 +1,5 @@
 name = "metacogna-gateway"
-main = "src/index.ts"
+main = "src/index.js"
 compatibility_date = "2024-07-01"
 workers_dev = false
 
@@ -27,13 +27,13 @@ bucket_name = "metacogna-accounts"
 binding = "CORE_SERVICE"
 service = "metacogna"
 
-[[services]]
-binding = "KV_SERVICE"
-service = "metacogna-ai-worker"
+# [[services]]
+# binding = "KV_SERVICE"
+# service = "metacogna-ai-worker"
 
-[[services]]
-binding = "BUILD_SERVICE"
-service = "parti-supervisor"
+# [[services]]
+# binding = "BUILD_SERVICE"
+# service = "parti-supervisor"
 
 [[services]]
 binding = "BASE_SERVICE"
